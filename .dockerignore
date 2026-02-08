@@ -1,0 +1,10 @@
+build/
+.gradle/
+out/
+.idea/
+.vscode/
+*.log
+.DS_Store
+Dockerfile
+.dockerignore
+.git/
