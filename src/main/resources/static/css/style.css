@@ -124,7 +124,8 @@ button:hover {
 
 #video-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 300px)); /* Smanjeni min/max za kvadrate */
+    justify-content: center;
     gap: 1rem;
     width: 100%;
     height: 100%;
@@ -136,8 +137,8 @@ button:hover {
     position: absolute;
     bottom: 20px;
     right: 20px;
-    width: 200px;
-    height: 150px;
+    width: 180px;
+    aspect-ratio: 1 / 1; /* Tvoj video je takodje kvadrat */
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0,0,0,0.5);
@@ -159,8 +160,7 @@ button:hover {
 .video-wrapper {
     position: relative;
     width: 100%;
-    height: 100%;
-    min-height: 200px;
+    aspect-ratio: 1 / 1; /* Remote videi su sada uvek kvadrati */
     border-radius: 10px;
     overflow: hidden;
     background: black;
@@ -169,7 +169,7 @@ button:hover {
 video {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: cover; /* Cover je bolji za video pozive, ali sad sa aspect-ratio wrapperom nece seci gornji deo */
     border-radius: 10px;
 }
 
@@ -295,14 +295,21 @@ video {
         padding: 1.5rem;
     }
 
+    .main-container {
+        flex-direction: column; /* Vertikalno na mobilnom po defaultu */
+    }
+
     #video-grid {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
         gap: 0.5rem;
     }
 
+    .video-wrapper {
+        aspect-ratio: 1 / 1; /* Kvadrati i na mobilnom */
+    }
+
     #local-video-container {
-        width: 120px;
-        height: 90px;
+        width: 100px;
         bottom: 10px;
         right: 10px;
     }
@@ -310,6 +317,7 @@ video {
     .controls-container {
         padding: 0.5rem;
         gap: 0.5rem;
+        order: 3; /* Kontrole na dnu */
     }
 
     .control-btn {
@@ -319,20 +327,54 @@ video {
     }
 
     .chat-container {
-        height: 150px;
+        height: 180px;
+        order: 2; /* Chat iznad kontrola */
     }
 }
 
-@media (max-height: 600px) {
+/* Landscape mod za mobilne telefone */
+@media (max-width: 950px) and (orientation: landscape) {
+    #room-screen {
+        padding: 5px;
+    }
+
+    .main-container {
+        flex-direction: row; /* Video levo, chat desno */
+        gap: 5px;
+    }
+
+    .video-container {
+        flex: 2;
+        padding: 5px;
+    }
+
+    .chat-container {
+        flex: 1;
+        height: 100%; /* Uzmi punu visinu u landscape-u */
+        display: flex !important; /* Osiguraj da se vidi */
+    }
+
+    .controls-container {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(30, 30, 30, 0.7);
+        padding: 5px;
+        border-radius: 30px;
+        z-index: 20;
+    }
+
+    #local-video-container {
+        width: 80px;
+        top: 10px;
+        right: 10px;
+        bottom: auto;
+    }
+}
+
+@media (max-height: 500px) and (orientation: portrait) {
     .chat-container {
         display: none;
-    }
-    
-    .card h1 {
-        font-size: 1.5rem;
-    }
-    
-    .card p {
-        margin-bottom: 1rem;
     }
 }
