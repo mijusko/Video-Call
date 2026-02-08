@@ -122,7 +122,15 @@ async function startLocalVideo() {
         addVideoElement('local', localStream, true);
     } catch (err) {
         console.error("Error accessing media devices.", err);
-        alert("Could not access camera/microphone.");
+        if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+            alert("No camera or microphone found. You can still join the room and chat, but others won't see or hear you.");
+        } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+            alert("Permission to access camera/microphone was denied. Please allow access in browser settings.");
+        } else {
+            alert("Could not access camera/microphone: " + err.message);
+        }
+        // Set localStream to null explicitly so other parts of code know we have no media
+        localStream = null;
     }
 }
 
@@ -347,15 +355,29 @@ let isVideoEnabled = true;
 let isScreenSharing = false;
 
 micBtn.onclick = () => {
+    if (!localStream) {
+        console.warn("Mic toggle failed: No local stream.");
+        return;
+    }
     isAudioEnabled = !isAudioEnabled;
-    localStream.getAudioTracks()[0].enabled = isAudioEnabled;
+    const audioTrack = localStream.getAudioTracks()[0];
+    if (audioTrack) {
+        audioTrack.enabled = isAudioEnabled;
+    }
     micBtn.innerHTML = isAudioEnabled ? '<i class="fa-solid fa-microphone"></i>' : '<i class="fa-solid fa-microphone-slash"></i>';
     micBtn.classList.toggle('muted', !isAudioEnabled);
 };
 
 cameraBtn.onclick = () => {
+    if (!localStream) {
+        console.warn("Camera toggle failed: No local stream.");
+        return;
+    }
     isVideoEnabled = !isVideoEnabled;
-    localStream.getVideoTracks()[0].enabled = isVideoEnabled;
+    const videoTrack = localStream.getVideoTracks()[0];
+    if (videoTrack) {
+        videoTrack.enabled = isVideoEnabled;
+    }
     cameraBtn.innerHTML = isVideoEnabled ? '<i class="fa-solid fa-video"></i>' : '<i class="fa-solid fa-video-slash"></i>';
     cameraBtn.classList.toggle('muted', !isVideoEnabled);
 };
@@ -403,18 +425,25 @@ function stopScreenShare() {
         screenStream.getTracks().forEach(track => track.stop());
     }
     
-    const videoTrack = localStream.getVideoTracks()[0];
-    
-    // Replace back to camera
-    for (let id in peers) {
-        const sender = peers[id].getSenders().find(s => s.track.kind === 'video');
-        if (sender) sender.replaceTrack(videoTrack);
-    }
-    
-    const localVideo = document.getElementById('video-local');
-    if (localVideo) {
-        localVideo.srcObject = localStream;
-        localVideo.style.transform = "rotateY(180deg)";
+    // Replace back to camera if available
+    if (localStream) {
+        const videoTrack = localStream.getVideoTracks()[0];
+        if (videoTrack) {
+            for (let id in peers) {
+                const sender = peers[id].getSenders().find(s => s.track && s.track.kind === 'video');
+                if (sender) sender.replaceTrack(videoTrack);
+            }
+        }
+        
+        const localVideo = document.getElementById('video-local');
+        if (localVideo) {
+            localVideo.srcObject = localStream;
+            localVideo.style.transform = "rotateY(180deg)";
+        }
+    } else {
+        // If no camera, just clear the local video view
+        const localVideo = document.getElementById('video-local');
+        if (localVideo) localVideo.srcObject = null;
     }
     
     isScreenSharing = false;
