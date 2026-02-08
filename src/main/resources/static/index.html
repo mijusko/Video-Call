@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoCall App</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Using FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- WELCOME SCREEN -->
+    <div id="welcome-screen" class="screen active">
+        <div class="overlay"></div>
+        <div class="card">
+            <h1>Welcome to VideoCall</h1>
+            <p>Connect with your friends and colleagues instantly.</p>
+            <input type="text" id="username-input" placeholder="Enter your name" />
+            <button id="get-started-btn">Get Started</button>
+        </div>
+    </div>
+
+    <!-- LOBBY SCREEN -->
+    <div id="lobby-screen" class="screen">
+        <div class="card">
+            <h2>Hello, <span id="display-name">User</span>!</h2>
+            <p>Enter a room ID to join a meeting.</p>
+            <input type="text" id="room-input" placeholder="Room ID (e.g. room1)" />
+            <button id="join-room-btn">Join Room</button>
+        </div>
+    </div>
+
+    <!-- ROOM SCREEN -->
+    <div id="room-screen" class="screen">
+        <div class="main-container">
+            <div class="video-container">
+                <div id="video-grid">
+                    <!-- Remote videos will be here -->
+                </div>
+                <!-- Local Video (Picture-in-Picture style) -->
+                <div id="local-video-container">
+                    <!-- Local video element injected here -->
+                </div>
+            </div>
+            
+            <div class="controls-container">
+                <button id="mic-btn" class="control-btn" title="Toggle Mic">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+                <button id="camera-btn" class="control-btn" title="Toggle Camera">
+                    <i class="fa-solid fa-video"></i>
+                </button>
+                <button id="screen-btn" class="control-btn" title="Share Screen">
+                    <i class="fa-solid fa-desktop"></i>
+                </button>
+                <button id="leave-btn" class="control-btn red-btn" title="Leave Call">
+                    <i class="fa-solid fa-phone-slash"></i>
+                </button>
+            </div>
+
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h3>Chat</h3>
+                </div>
+                <div id="chat-messages" class="chat-messages">
+                    <!-- Messages go here -->
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="Type a message..." />
+                    <button id="send-msg-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
