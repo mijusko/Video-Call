@@ -1,4 +1,5 @@
-const socket = new WebSocket("ws://" + window.location.host + "/signal");
+const wsProtocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+const socket = new WebSocket(wsProtocol + window.location.host + "/signal");
 const configuration = {
     iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
