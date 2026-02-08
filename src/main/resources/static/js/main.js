@@ -119,18 +119,32 @@ function sendSignal(data) {
 async function startLocalVideo() {
     try {
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        addVideoElement('local', localStream, true);
     } catch (err) {
         console.error("Error accessing media devices.", err);
         if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
-            alert("No camera or microphone found. You can still join the room and chat, but others won't see or hear you.");
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+            } catch (audioErr) {
+                try {
+                    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                } catch (videoErr) {
+                    alert("No camera or microphone found. You can still join the room and chat, but others won't see or hear you.");
+                    localStream = null;
+                    return;
+                }
+            }
         } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
             alert("Permission to access camera/microphone was denied. Please allow access in browser settings.");
+            localStream = null;
+            return;
         } else {
             alert("Could not access camera/microphone: " + err.message);
+            localStream = null;
+            return;
         }
-        // Set localStream to null explicitly so other parts of code know we have no media
-        localStream = null;
+    }
+    if (localStream) {
+        addVideoElement('local', localStream, true);
     }
 }
 
@@ -147,6 +161,8 @@ function createPeerConnection(targetId, initiator, targetUsername) {
         localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
     } else {
         console.warn("No local stream available when creating peer connection");
+        pc.addTransceiver("audio", { direction: "recvonly" });
+        pc.addTransceiver("video", { direction: "recvonly" });
     }
     
     pc.onicecandidate = (event) => {
